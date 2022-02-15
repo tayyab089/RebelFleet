@@ -1,7 +1,7 @@
 import React from "react";
 import {View, Text} from 'react-native';
 
-const SettingsPage = () => {
+const FuelPage = () => {
     return (
         <View>
             <Text>This is SettingsPage</Text>
@@ -9,4 +9,4 @@ const SettingsPage = () => {
     )
 }
 
-export default SettingsPage;
+export default FuelPage;

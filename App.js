@@ -1,23 +1,22 @@
 import React from 'react';
 import {StatusBar} from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+// import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import {DefaultTheme, Provider as PaperProvider, useTheme, Button} from 'react-native-paper';
-import Ionicons from 'react-native-vector-icons/Ionicons';
+import {DefaultTheme, Provider as PaperProvider, useTheme, IconButton} from 'react-native-paper';
+
 
 import {UserContext, AuthContext} from './src/Utils/AuthLogic';
 import * as Keychain from 'react-native-keychain';
 import {Alert} from 'react-native';
 
-
-import HomePage from './src/Views/Home'
-import SettingsPage from './src/Views/Settings'
 import LoginView from './src/Views/Login';
 import SplashScreen from './src/Views/Splash';
+import Home from './src/Views/Home';
+import Tabbed from './src/Navigators/Tabbed';
 
 const Stack = createNativeStackNavigator();
-const Tab = createBottomTabNavigator();
+// const Tab = createBottomTabNavigator();
 
 const theme = {
   ...DefaultTheme,
@@ -166,34 +165,22 @@ const App = () => {
             {state.isLoading ? 
             (<SplashScreen/>) : state.userToken == null ? 
             (<LoginView/>) : 
-            (<Tab.Navigator 
-            screenOptions={({ route }) => ({
-              tabBarIcon: ({ focused, color, size }) => {
-                let iconName;
-
-                if (route.name === 'Home') {
-                  iconName = focused ? 'home' : 'home-outline';
-                } else if (route.name === 'Settings') {
-                  iconName = focused ? 'settings' : 'settings-outline';
-                }
-                return <Ionicons name={iconName} size={size} color={color} />;
-              },
-              tabBarActiveTintColor: '#f4511e',
-              tabBarInactiveTintColor: 'gray',
-              headerStyle: {backgroundColor: '#f4511e'},
-              headerTintColor: '#fff',
-              headerRight: () => (
-                <Button
+            (<Stack.Navigator 
+              screenOptions = {{
+                headerStyle: {backgroundColor: '#f4511e'},
+                headerTintColor: '#fff',
+                headerRight: () => (
+                <IconButton
                   onPress={() => signOut()}
-                  icon="logout" 
-                  mode="text"
-                  theme={{colors: {primary: 'white', placeholder: '#fff', text: '#fff'}}}
+                  icon="logout"
+                  color='white'
+                  size={20}
                 />
               ),
-            })}>
-              <Tab.Screen name="Home" component={HomePage} />
-              <Tab.Screen name="Settings" component={SettingsPage} />
-            </Tab.Navigator>)}
+              }}>
+              <Stack.Screen name='Home' component={Home} />
+              <Stack.Screen name='Tabs' component={Tabbed} />
+            </Stack.Navigator>)}
           </NavigationContainer>
         </PaperProvider>
       </UserContext.Provider>

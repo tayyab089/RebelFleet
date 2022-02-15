@@ -1,120 +1,108 @@
-import React, {useState} from "react";
-import {View, Image, Text, StyleSheet, PermissionsAndroid, Alert} from 'react-native';
-import { Button } from "react-native-paper";
-import {launchCamera, launchImageLibrary} from 'react-native-image-picker'
+import React, {useState, useRef, useEffect} from "react";
+import {ScrollView, StyleSheet, FlatList, View, Alert} from 'react-native';
 
-const HomePage = () => {
-    const [image, setImage] = useState();
-    const [text, setText] = useState('Converted Text Will appear here');
+import CardComponent from "../Components/Card";
+import ListComponent from "../Components/ListComponent";
+import AddNew from "../Components/AddNew";
+import AddCarModal from "../Utils/AddNewCarModal";
+import promptUser from "../Utils/AsyncAlert";
 
-    //On Photo From Camera Handler
-    const onTakePhoto = () => {
-      const requestCameraPermission = async () => {
-        try {
-          const granted = await PermissionsAndroid.request(
-            PermissionsAndroid.PERMISSIONS.CAMERA,
-            {
-              title: "Camera Permission",
-              message:
-                "RebelFleet needs access to your camera ",
-              buttonNeutral: "Ask Me Later",
-              buttonNegative: "Cancel",
-              buttonPositive: "OK"
-            }
-          );
-          if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-            launchCamera({
-              mediaType:'photo', 
-              // quality: 1, 
-              // maxWidth:800, 
-              // maxHeight:600, 
-              includeBase64: true
-            }, onImageSelect)
-          } else {
-            Alert.alert("Camera permission denied");
-          }
-        } catch (err) {
-          console.warn(err);
-        }
-      };
-      requestCameraPermission()
-    }
+import {openDatabase} from 'react-native-sqlite-storage';
+import { SafeAreaView } from "react-native-safe-area-context";
 
-    //Photo from Storage Handler
-    const onSelectImagePress = () => {
-      const requestStoragePermission = async () => {
-        try {
-          const granted = await PermissionsAndroid.request(
-            PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
-            {
-              title: "Storage Permission",
-              message:
-                "RebelFleet needs access your storage ",
-              buttonNeutral: "Ask Me Later",
-              buttonNegative: "Cancel",
-              buttonPositive: "OK"
-            }
-          );
-          if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-            launchImageLibrary({
-              mediaType: 'photo',
-              quality: 1, 
-              // maxWidth:1600, 
-              // maxHeight:1000, 
-              includeBase64: true
-            }, onImageSelect)
-          } else {
-            Alert.alert("Camera permission denied");
-          }
-        } catch (err) {
-          console.warn(err);
-        }
-      };
-      requestStoragePermission()
-    }
+const db = openDatabase({name: 'database.db', createFromLocation: 1});
 
 
-    //Callback after image loaded
-    const onImageSelect = async (media) => {
-        if (!media.didCancel){
-          setImage(media.assets[0].uri);
-          console.log(media.assets[0].fileSize)
-        
-          //fetch options
-          const options = {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(media.assets[0]),
-          };
+const HomePage = ({navigation}) => {
+    const mounted = useRef(true);
+    const [carData, setCarData] = useState([
+      {ID: 1, Make: 'Toyota', Model: 'Corolla 2017', Reg_No:'BJT1951'},
+      {ID: 2, Make: 'Toyota', Model: 'Corolla 2017', Reg_No:'BJT1951'}
+    ])
 
-        
-          //fetch command
-          fetch('http://192.168.10.13:3000',options)
-          .then(resp=>resp.json())
-          .then(response=>{
-            console.log(response)
-            setText(response)
-          })
-        } else {Alert.alert('Picutre not selected')}
+    //Add Card Modal Constants
+    const [visible, setVisible] = useState(false);
+    const showCarModal = () => setVisible(true);
+    const hideCarModal = () => {
+      retrieveData()
+      setVisible(false)
     };
 
+    useEffect(() => {
+      navigation.addListener('focus', () => {
+        retrieveData();
+      });
+    }, []);
+
+    const retrieveData = () => {
+      db.transaction(tx => {
+        tx.executeSql('SELECT * FROM cars', [], (_tx, results) => {
+          var temp = [];
+          console.log(results.rows.length);
+          for (let i = 0; i < results.rows.length; ++i) {
+            temp.push(results.rows.item(i));
+            console.log(temp)
+          }
+          if (mounted.current) {
+            setCarData(temp);
+          }
+        });
+      });
+    };
+
+    const deleteCar = ID => {
+      promptUser('CAUTION', 'Are You Sure?').then(res => {
+        if (res === 'Yes') {
+          db.transaction(tx => {
+            console.log(ID)
+            tx.executeSql(
+              'DELETE FROM cars where ID=?',
+              [ID],
+              (_tx, results) => {
+                if (results.rows.length === 0) {
+                  Alert.alert('Data Deleted Successfully....');
+                  retrieveData();
+                }
+              },
+            );
+          });
+        } else {
+          return;
+        }
+      });
+    };
+
+    const renderItem = ({item, index}) => (
+      <CardComponent 
+        Make = {item.Make} 
+        Model={item.Model} 
+        Reg_No={item.Reg_No}
+        Image={item.Image} 
+        navigation = {navigation}
+        deleteCar={() => deleteCar(item.ID)} />
+    );
+
     return (
+      <SafeAreaView>
         <View style = {styles.container}>
-            <Button onPress={onTakePhoto}>Capture Image</Button>
-            <Button onPress={onSelectImagePress}>Pick Image</Button>
-            <Image source={{uri:image, height:150, width:150}} resizeMode ='contain'/>
-            <Text>{text}</Text>
+          <AddNew showCarModal={showCarModal} />
+          <AddCarModal 
+            visible={visible} 
+            hideCarModal={hideCarModal}
+            />
+          <FlatList
+            data={carData}
+            renderItem={renderItem}
+            keyExtractor={(_item, index) => _item.ID}
+          />
         </View>
+      </SafeAreaView>
     )
 };
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    margin: 5,
   }
 })
 
