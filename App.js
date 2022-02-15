@@ -2,6 +2,7 @@ import React from 'react';
 import {StatusBar} from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import {DefaultTheme, Provider as PaperProvider, useTheme, Button} from 'react-native-paper';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
@@ -15,6 +16,7 @@ import SettingsPage from './src/Views/Settings'
 import LoginView from './src/Views/Login';
 import SplashScreen from './src/Views/Splash';
 
+const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
 const theme = {
