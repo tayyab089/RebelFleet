@@ -5,7 +5,7 @@ import {NavigationContainer} from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import {DefaultTheme, Provider as PaperProvider, useTheme, IconButton} from 'react-native-paper';
 
-
+import HeaderTitle from './src/Utils/HeaderTitle';
 import {UserContext, AuthContext} from './src/Utils/AuthLogic';
 import * as Keychain from 'react-native-keychain';
 import {Alert} from 'react-native';
@@ -178,8 +178,11 @@ const App = () => {
                 />
               ),
               }}>
-              <Stack.Screen name='Home' component={Home} />
-              <Stack.Screen name='Tabs' component={Tabbed} />
+              <Stack.Screen name='Home' component={Home} options={{ headerTitle: (props) => <HeaderTitle {...props} /> }}/>
+              <Stack.Screen 
+                name='Tabs' 
+                component={Tabbed}
+                options={({ route }) => ({ headerTitle: (props) => <HeaderTitle {...props} title={route.params.title}/> })} />
             </Stack.Navigator>)}
           </NavigationContainer>
         </PaperProvider>

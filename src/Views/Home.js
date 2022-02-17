@@ -60,7 +60,30 @@ const HomePage = ({navigation}) => {
               [ID],
               (_tx, results) => {
                 if (results.rows.length === 0) {
-                  Alert.alert('Data Deleted Successfully....');
+                  //retrieveData();
+                }
+              },
+            );
+          });
+          db.transaction(tx => {
+            console.log(ID)
+            tx.executeSql(
+              'DELETE FROM milage where Car=?',
+              [ID],
+              (_tx, results) => {
+                if (results.rows.length === 0) {
+                  //retrieveData();
+                }
+              },
+            );
+          });
+          db.transaction(tx => {
+            console.log(ID)
+            tx.executeSql(
+              'DELETE FROM fuel where Car=?',
+              [ID],
+              (_tx, results) => {
+                if (results.rows.length === 0) {
                   retrieveData();
                 }
               },
@@ -74,6 +97,7 @@ const HomePage = ({navigation}) => {
 
     const renderItem = ({item, index}) => (
       <CardComponent 
+        ID = {item.ID}
         Make = {item.Make} 
         Model={item.Model} 
         Reg_No={item.Reg_No}
@@ -85,7 +109,7 @@ const HomePage = ({navigation}) => {
     return (
       <SafeAreaView>
         <View style = {styles.container}>
-          <AddNew showCarModal={showCarModal} />
+          <AddNew showModal={showCarModal} />
           <AddCarModal 
             visible={visible} 
             hideCarModal={hideCarModal}

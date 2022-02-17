@@ -1,120 +1,148 @@
-import React, {useState} from "react";
-import {View, Image, Text, StyleSheet, PermissionsAndroid, Alert} from 'react-native';
-import { Button } from "react-native-paper";
-import {launchCamera, launchImageLibrary} from 'react-native-image-picker'
+import React, {useState, useEffect, useRef, useContext} from "react";
+import {View, StyleSheet, ScrollView, Alert, Text} from 'react-native';
+import { DataTable, IconButton, useTheme } from "react-native-paper";
+import {openDatabase} from 'react-native-sqlite-storage';
 
-const MilagePage = () => {
-    const [image, setImage] = useState();
-    const [text, setText] = useState('Converted Text Will appear here');
+import IDContext from "../Utils/IDContext";
 
-    //On Photo From Camera Handler
-    const onTakePhoto = () => {
-      const requestCameraPermission = async () => {
-        try {
-          const granted = await PermissionsAndroid.request(
-            PermissionsAndroid.PERMISSIONS.CAMERA,
-            {
-              title: "Camera Permission",
-              message:
-                "RebelFleet needs access to your camera ",
-              buttonNeutral: "Ask Me Later",
-              buttonNegative: "Cancel",
-              buttonPositive: "OK"
-            }
-          );
-          if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-            launchCamera({
-              mediaType:'photo', 
-              // quality: 1, 
-              // maxWidth:800, 
-              // maxHeight:600, 
-              includeBase64: true
-            }, onImageSelect)
-          } else {
-            Alert.alert("Camera permission denied");
-          }
-        } catch (err) {
-          console.warn(err);
+import AddNew from "../Components/AddNew";
+import AddMilageModal from "../Utils/AddNewMilageModal";
+import promptUser from "../Utils/AsyncAlert";
+
+const db = openDatabase({name: 'database.db', createFromLocation: 1});
+
+const numberOfItemsPerPageList = [5, 8, 10]; // Items per page for the pagination
+
+const MilagePage = ({route}) => {
+  const {carID} = useContext(IDContext);
+  const mounted = useRef(true)
+  const [milageData, setMilageData] = useState([])
+  const {colors} = useTheme();
+  //Add Milage Modal Constants
+  const [visible, setVisible] = useState(false);
+  const showMilageModal = () => setVisible(true);
+  const hideMilageModal = () => {
+    retrieveData()
+    setVisible(false)
+  };
+
+  //Variables for Pagination Start
+  const [page, setPage] = useState(0);
+  const [numberOfItemsPerPage, onItemsPerPageChange] = useState(
+    numberOfItemsPerPageList[1],
+  );
+  const from = page * numberOfItemsPerPage;
+  const to = Math.min((page + 1) * numberOfItemsPerPage, milageData.length);
+  let list = [];
+
+  useEffect(() => {
+    setPage(0);
+ }, [numberOfItemsPerPage]);
+  //State Variables for Pagination End
+
+  useEffect(() => {
+      retrieveData();
+  }, []);
+
+  const retrieveData = () => {
+    db.transaction(tx => {
+      tx.executeSql('SELECT * FROM milage', [], (_tx, results) => {
+        var temp = [];
+        for (let i = 0; i < results.rows.length; ++i) {
+          if (results.rows.item(i).Car === carID){
+            temp.push(results.rows.item(i))}
+            console.log(temp)
         }
-      };
-      requestCameraPermission()
-    }
-
-    //Photo from Storage Handler
-    const onSelectImagePress = () => {
-      const requestStoragePermission = async () => {
-        try {
-          const granted = await PermissionsAndroid.request(
-            PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
-            {
-              title: "Storage Permission",
-              message:
-                "RebelFleet needs access your storage ",
-              buttonNeutral: "Ask Me Later",
-              buttonNegative: "Cancel",
-              buttonPositive: "OK"
-            }
-          );
-          if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-            launchImageLibrary({
-              mediaType: 'photo',
-              quality: 1, 
-              // maxWidth:1600, 
-              // maxHeight:1000, 
-              includeBase64: true
-            }, onImageSelect)
-          } else {
-            Alert.alert("Camera permission denied");
-          }
-        } catch (err) {
-          console.warn(err);
+        if (mounted.current) {
+          setMilageData(temp);
         }
-      };
-      requestStoragePermission()
-    }
+      });
+    });
+  };
 
-
-    //Callback after image loaded
-    const onImageSelect = async (media) => {
-        if (!media.didCancel){
-          setImage(media.assets[0].uri);
-          console.log(media.assets[0].fileSize)
-        
-          //fetch options
-          const options = {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
+  const deleteEntry = date => {
+    promptUser('CAUTION', 'Are You Sure?').then(res => {
+      if (res === 'Yes') {
+        db.transaction(tx => {
+          console.log(date)
+          tx.executeSql(
+            'DELETE FROM milage where DateTime=?',
+            [date],
+            (_tx, results) => {
+              if (results.rows.length === 0) {
+                Alert.alert('Data Deleted Successfully....');
+                retrieveData();
+              }
             },
-            body: JSON.stringify(media.assets[0]),
-          };
+          );
+        });
+      } else {
+        return;
+      }
+    });
+  };
 
-        
-          //fetch command
-          fetch('http://192.168.10.13:3000',options)
-          .then(resp=>resp.json())
-          .then(response=>{
-            console.log(response)
-            setText(response)
-          })
-        } else {Alert.alert('Picutre not selected')}
-    };
-
-    return (
-        <View style = {styles.container}>
-            <Button onPress={onTakePhoto}>Capture Image</Button>
-            <Button onPress={onSelectImagePress}>Pick Image</Button>
-            <Image source={{uri:image, height:150, width:150}} resizeMode ='contain'/>
-            <Text>{text}</Text>
-        </View>
-    )
+  return (
+      <View style = {styles.container}>
+          <AddNew showModal={showMilageModal}/>
+          <AddMilageModal 
+            visible={visible} 
+            hideModal={hideMilageModal}
+            carID = {carID}
+          />
+          <DataTable style={{elevation: 2, width: '95%', alignSelf: 'center'}}>
+          <DataTable.Header>
+            <DataTable.Title style={{flex: 2}}>S.No</DataTable.Title>
+            <DataTable.Title style={{flex: 3}}>DATE</DataTable.Title>
+            <DataTable.Title style={{flex: 3}}>TIME</DataTable.Title>
+            <DataTable.Title style={{flex: 3}}>MILAGE</DataTable.Title>
+            <DataTable.Title style={{flex: 1}}></DataTable.Title>
+          </DataTable.Header>
+          <ScrollView>
+            {milageData.map( (item, index) => {
+              const date = item.DateTime.slice(4,15)
+              const time = item.DateTime.slice(16,24)
+              return (
+                <DataTable.Row
+                  key={item.DateTime}
+                  onPress={() => {}}>
+                  <DataTable.Cell style={{flex: 1}}>{index+1}</DataTable.Cell>
+                  <DataTable.Cell style={{flex: 3}}>{date}</DataTable.Cell>
+                  <DataTable.Cell style={{flex: 2}}>{time}</DataTable.Cell>
+                  <DataTable.Cell style={{flex: 2}}>{item.Milage}</DataTable.Cell>
+                  <DataTable.Cell style={{flex: 1}}>
+                    <IconButton 
+                      icon="delete-forever-outline"
+                      color={colors.primary}
+                      size={20}
+                      onPress={() => {deleteEntry(item.DateTime)}} />
+                  </DataTable.Cell>
+                </DataTable.Row>
+              );
+            })}
+            <DataTable.Pagination
+              page={page}
+              numberOfPages={Math.ceil(milageData.length / numberOfItemsPerPage)}
+              onPageChange={page => setPage(page)}
+              label={`${from + 1}-${to} of ${milageData.length}`}
+              showFastPaginationControls
+              numberOfItemsPerPageList={numberOfItemsPerPageList}
+              numberOfItemsPerPage={numberOfItemsPerPage}
+              onItemsPerPageChange={onItemsPerPageChange}
+              selectPageDropdownLabel={'Rows per page'}
+            />
+          </ScrollView>
+          </DataTable>
+      </View>
+  )
 };
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    // flex: 1,
+    // justifyContent: 'center',
+    // alignItems: 'center',
+    margin: 5,
   }
 })
 

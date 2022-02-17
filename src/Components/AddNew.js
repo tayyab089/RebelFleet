@@ -2,7 +2,7 @@ import React from "react";
 import {StyleSheet} from 'react-native';
 import { IconButton, Surface, useTheme, Title } from "react-native-paper";
 
-const AddNew = ({showCarModal}) => {
+const AddNew = ({showModal}) => {
     const {colors} = useTheme();
     return (
         <Surface style= {styles.Surface}>
@@ -10,7 +10,8 @@ const AddNew = ({showCarModal}) => {
             icon="plus-circle-outline"
             color={colors.primary}
             size={20}
-            onPress={() => showCarModal()} />
+            style= {{marginRight: 13}}
+            onPress={() => showModal()} />
             <Title style = {{...styles.Text, color: colors.primary}}>ADD NEW</Title>
         </Surface>
     )
