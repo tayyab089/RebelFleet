@@ -22,6 +22,10 @@ const AddfuelModal = ({
 
   //Data Storage into the DB
   const dataStorage = () => {
+    if (fuel == '' || fuelCost == '') {
+      Alert.alert('Please Input All Values')
+      return;
+    }
     let currentdate = new Date();
     let car = carID;
     db.transaction(function (tx) {

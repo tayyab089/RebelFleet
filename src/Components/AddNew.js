@@ -1,19 +1,19 @@
 import React from "react";
-import {StyleSheet} from 'react-native';
+import {StyleSheet, View} from 'react-native';
 import { IconButton, Surface, useTheme, Title } from "react-native-paper";
 
 const AddNew = ({showModal}) => {
     const {colors} = useTheme();
     return (
-        <Surface style= {styles.Surface}>
+        <View style= {{...styles.Surface, backgroundColor: colors.primary}}>
             <IconButton 
             icon="plus-circle-outline"
-            color={colors.primary}
+            color={colors.textOnOrange}
             size={20}
             style= {{marginRight: 13}}
             onPress={() => showModal()} />
-            <Title style = {{...styles.Text, color: colors.primary}}>ADD NEW</Title>
-        </Surface>
+            <Title style = {{...styles.Text, color: colors.textOnOrange}}>ADD NEW</Title>
+        </View>
     )
 };
 
@@ -23,8 +23,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row-reverse',
     alignItems: 'center',
     justifyContent: 'space-between',
-    margin: 5,
-    borderRadius: 5,
+    // margin: 5,
+    // borderRadius: 5,
   },
   Text: {
     marginLeft: 10,

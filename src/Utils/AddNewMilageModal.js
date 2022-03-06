@@ -21,6 +21,10 @@ const AddMilageModal = ({
 
   //Data Storage into the DB
   const dataStorage = () => {
+    if (milage == '') {
+      Alert.alert('Please Input All Values')
+      return;
+    }
     let currentdate = new Date();
     let car = carID;
     db.transaction(function (tx) {

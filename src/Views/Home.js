@@ -1,5 +1,5 @@
 import React, {useState, useRef, useEffect} from "react";
-import {ScrollView, StyleSheet, FlatList, View, Alert} from 'react-native';
+import {ScrollView, StyleSheet, FlatList, View, Animated} from 'react-native';
 
 import CardComponent from "../Components/Card";
 import ListComponent from "../Components/ListComponent";
@@ -9,6 +9,8 @@ import promptUser from "../Utils/AsyncAlert";
 
 import {openDatabase} from 'react-native-sqlite-storage';
 import { SafeAreaView } from "react-native-safe-area-context";
+
+//import { useHeaderHeight } from '@react-navigation/elements';
 
 const db = openDatabase({name: 'database.db', createFromLocation: 1});
 
@@ -105,19 +107,48 @@ const HomePage = ({navigation}) => {
         navigation = {navigation}
         deleteCar={() => deleteCar(item.ID)} />
     );
+    //Header Animationn
+    // const scrollY = useRef(new Animated.Value(0));
+    // const handleScroll = Animated.event(
+    //   [
+    //     {
+    //       nativeEvent: {
+    //         contentOffset: {y: scrollY.current},
+    //       },
+    //     },
+    //   ],
+    //   {
+    //     useNativeDriver: true,
+    //   },
+    // );
+    // const headerHeight = 100
+    // const scrollYClamped = Animated.diffClamp(scrollY.current, 0, headerHeight);
+    // const translateY = scrollYClamped.interpolate({
+    //   inputRange: [0, headerHeight],
+    //   outputRange: [0, -(headerHeight / 2)],
+    //   });
+    //  const translateYNumber = useRef();
+    //  translateY.addListener(({value}) => {
+    //    translateYNumber.current = value;
+    //  });
 
     return (
       <SafeAreaView>
+        {/* <Animated.View style={[styles.header, {transform: [{translateY}]}]}>
+          <View style={{backgroundColor: 'blue', height: headerHeight/2}}></View>
+        </Animated.View> */}
         <View style = {styles.container}>
           <AddNew showModal={showCarModal} />
           <AddCarModal 
             visible={visible} 
             hideCarModal={hideCarModal}
             />
-          <FlatList
+          <Animated.FlatList
             data={carData}
             renderItem={renderItem}
             keyExtractor={(_item, index) => _item.ID}
+            // onScroll= {handleScroll}
+            contentContainerStyle={{ paddingBottom: 200 }}
           />
         </View>
       </SafeAreaView>

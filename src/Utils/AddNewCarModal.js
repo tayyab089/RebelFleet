@@ -22,6 +22,10 @@ const AddCarModal = ({
 
   //Data Storage into the DB
   const dataStorage = () => {
+    if (make == '' || model == ''|| Reg_No == '') {
+      Alert.alert('Please Input All Values')
+      return;
+    }
     db.transaction(function (tx) {
       tx.executeSql(
         'INSERT INTO cars (Make, Model, Reg_No, Image) VALUES (?,?,?,?)',
