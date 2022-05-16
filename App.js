@@ -25,9 +25,10 @@ const theme = {
   colors: {
     ...DefaultTheme.colors,
     primary: '#f4511e',
-    accent: '#03dac4',
+    accent: '#f4511e',
     background: '#f6f6f6',
     textOnOrange: '#fff',
+    tabbed : ['#fff','#f2f1f0'],
   },
 };
 

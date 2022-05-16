@@ -13,10 +13,12 @@ const AddMilageModal = ({
   visible,
   hideModal,
   carID,
+  latestMilage,
 }) => {
   const containerStyle = {backgroundColor: 'white', padding: 10, paddingTop: 20,  margin: 20, borderRadius: 10};
 
   const [milage, setMilage] = useState('');
+  const [milageRemarks, setMilageRemarks] = useState('');
   // const [image, setImage] = useState('https://media.istockphoto.com/photos/red-generic-sedan-car-isolated-on-white-background-3d-illustration-picture-id1189903200?k=20&m=1189903200&s=612x612&w=0&h=L2bus_XVwK5_yXI08X6RaprdFKF1U9YjpN_pVYPgS0o=')
 
   //Data Storage into the DB
@@ -27,10 +29,12 @@ const AddMilageModal = ({
     }
     let currentdate = new Date();
     let car = carID;
+    console.log(latestMilage)
+    let milageDiff = milage - latestMilage
     db.transaction(function (tx) {
       tx.executeSql(
-        'INSERT INTO milage (Car, DateTime, Milage) VALUES (?,?,?)',
-        [car, currentdate.toString(), milage],
+        'INSERT INTO milage (Car, DateTime, Milage, Remarks, MilageDiff) VALUES (?,?,?,?,?)',
+        [car, currentdate.toString(), milage, milageRemarks, milageDiff],
         (_tx, results) => {
           console.log('Results', results.rowsAffected);
           if (results.rowsAffected > 0) {
@@ -67,12 +71,7 @@ const AddMilageModal = ({
 //             // maxHeight:600,
 //             saveToPhotos: true 
 //           }, onImageSelect)
-//         } else {
-//           Alert.alert("Camera permission denied");
-//         }
-//       } catch (err) {
-//         console.warn(err);
-//       }
+//         } else {milage
 //     };
 //     requestCameraPermission()
 //   };
@@ -138,6 +137,14 @@ const AddMilageModal = ({
                 mode='outlined'
                 dense='true'
                 keyboardType="numeric"
+            />
+            <TextInput
+                style = {styles.textStyle}
+                label="Remarks"
+                value={milageRemarks}
+                onChangeText={milageRemarks => setMilageRemarks(milageRemarks)}
+                mode='outlined'
+                multiline={true}
             />
             {/* <Button onPress={onTakePhoto}>Capture Image</Button>
             <Button onPress={onSelectImagePress}>Pick Image</Button>

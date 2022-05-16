@@ -6,6 +6,7 @@ import IDContext from '../Utils/IDContext';
 
 import MilagePage from '../Views/Milage';
 import FuelPage from '../Views/Fuel';
+import TrendPage from '../Views/Trend';
 
 const Tab = createBottomTabNavigator();
 
@@ -23,6 +24,8 @@ const Tabbed = ({route}) => {
                   iconName = focused ? 'speedometer' : 'speedometer-outline';
                 } else if (route.name === 'Fuel') {
                   iconName = focused ? 'beaker' : 'beaker-outline';
+                } else if (route.name === 'Trend') {
+                  iconName = focused ? 'analytics' : 'analytics-outline';
                 }
                 return <Ionicons name={iconName} size={size} color={color} />;
               },
@@ -39,6 +42,11 @@ const Tabbed = ({route}) => {
               <Tab.Screen 
                 name="Fuel" 
                 component={FuelPage}
+                options={{headerShown: false}}
+                 />
+              <Tab.Screen 
+                name="Trend" 
+                component={TrendPage}
                 options={{headerShown: false}}
                  />
             </Tab.Navigator>

@@ -18,6 +18,7 @@ const AddfuelModal = ({
 
   const [fuel, setFuel] = useState('');
   const [fuelCost, setFuelCost] = useState('');
+  const [Remarks, setRemarks] = useState('');
   // const [image, setImage] = useState('https://media.istockphoto.com/photos/red-generic-sedan-car-isolated-on-white-background-3d-illustration-picture-id1189903200?k=20&m=1189903200&s=612x612&w=0&h=L2bus_XVwK5_yXI08X6RaprdFKF1U9YjpN_pVYPgS0o=')
 
   //Data Storage into the DB
@@ -30,8 +31,8 @@ const AddfuelModal = ({
     let car = carID;
     db.transaction(function (tx) {
       tx.executeSql(
-        'INSERT INTO fuel (Car, DateTime, FuelAmount, FuelCost) VALUES (?,?,?,?)',
-        [car, currentdate.toString(), fuel, fuelCost],
+        'INSERT INTO fuel (Car, DateTime, FuelAmount, FuelCost, Remarks) VALUES (?,?,?,?,?)',
+        [car, currentdate.toString(), fuel, fuelCost, Remarks],
         (_tx, results) => {
           console.log('Results', results.rowsAffected);
           if (results.rowsAffected > 0) {
@@ -60,7 +61,7 @@ const AddfuelModal = ({
             </Title>
             <TextInput
                 style = {styles.textStyle}
-                label="fuel Amout"
+                label="Fuel Amout"
                 value={fuel}
                 onChangeText={fuel => setFuel(fuel)}
                 mode='outlined'
@@ -69,12 +70,20 @@ const AddfuelModal = ({
             />
             <TextInput
                 style = {styles.textStyle}
-                label="fuel Cost"
+                label="Fuel Cost"
                 value={fuelCost}
                 onChangeText={fuelCost => setFuelCost(fuelCost)}
                 mode='outlined'
                 dense='true'
                 keyboardType="numeric"
+            />
+            <TextInput
+                style = {styles.textStyle}
+                label="Remarks"
+                value={Remarks}
+                onChangeText={Remarks => setRemarks(Remarks)}
+                mode='outlined'
+                multiline={true}
             />
             <Button
                 mode='contained'
