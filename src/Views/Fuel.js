@@ -103,8 +103,8 @@ const FuelPage = ({route}) => {
     const wbout = XLSX.write(wb, {type:'binary', bookType:"xlsx"});
 
     // Write generated excel to Storage
-    RNFS.writeFile(RNFS.DownloadDirectoryPath + '/RebelFleetData.xlsx', wbout, 'ascii').then((r)=>{
-     console.log('Success');
+    RNFS.writeFile(RNFS.DownloadDirectoryPath + '/FuelData.xlsx', wbout, 'ascii').then((r)=>{
+      Alert.alert('FILE SUCCESSFULLY DOWNLOADED TO DOWNLOADS FOLDER');
     }).catch((e)=>{
       console.log('Error', e);
     });

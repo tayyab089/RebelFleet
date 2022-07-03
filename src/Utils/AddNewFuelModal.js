@@ -36,7 +36,7 @@ const AddfuelModal = ({
         (_tx, results) => {
           console.log('Results', results.rowsAffected);
           if (results.rowsAffected > 0) {
-            Alert.alert('Data Inserted Successfully....');
+            // Alert.alert('Data Inserted Successfully....');
             hideModal()
           } else {
             Alert.alert('Failed....');

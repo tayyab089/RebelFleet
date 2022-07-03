@@ -2,7 +2,7 @@ import React from "react";
 import {StyleSheet, View} from 'react-native';
 import { Card, Title, Paragraph, IconButton, useTheme } from "react-native-paper";
 
-const CardComponent = ({ID, Make, Model, Reg_No, Image, deleteCar, navigation}) => {
+const CardComponent = ({ID, Make, Model, Reg_No, Image, deleteCar, navigation, sMilage}) => {
   const {colors} = useTheme()
 
   return (
@@ -12,7 +12,8 @@ const CardComponent = ({ID, Make, Model, Reg_No, Image, deleteCar, navigation}) 
         style = {styles.card}
         onPress={() => navigation.navigate('Tabs', {
             ID : ID,
-            title: Model
+            title: Model,
+            sMilage: sMilage,
         })}
         onLongPress={() => deleteCar()}>
           <Card.Content>

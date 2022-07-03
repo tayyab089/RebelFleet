@@ -11,7 +11,8 @@ import TrendPage from '../Views/Trend';
 const Tab = createBottomTabNavigator();
 
 const Tabbed = ({route}) => {
-  const idcontext = {carID : route.params.ID}
+  const idcontext = {carID : route.params.ID, sMilage: route.params.sMilage}
+  console.log(route.params)
 
     return (
       <IDContext.Provider value={idcontext}>

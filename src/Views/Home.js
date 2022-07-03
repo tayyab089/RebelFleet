@@ -18,8 +18,8 @@ const db = openDatabase({name: 'database.db', createFromLocation: 1});
 const HomePage = ({navigation}) => {
     const mounted = useRef(true);
     const [carData, setCarData] = useState([
-      {ID: 1, Make: 'Toyota', Model: 'Corolla 2017', Reg_No:'BJT1951'},
-      {ID: 2, Make: 'Toyota', Model: 'Corolla 2017', Reg_No:'BJT1951'}
+      {ID: 1, Make: 'Toyota', Model: 'Corolla 2017', Reg_No:'BJT1951', sMilage: 1234},
+      {ID: 2, Make: 'Toyota', Model: 'Corolla 2017', Reg_No:'BJT1951', sMilage: 1234}, 
     ])
 
     //Add Card Modal Constants
@@ -105,6 +105,7 @@ const HomePage = ({navigation}) => {
         Reg_No={item.Reg_No}
         Image={item.Image} 
         navigation = {navigation}
+        sMilage = {item.SMilage}
         deleteCar={() => deleteCar(item.ID)} />
     );
     //Header Animationn

@@ -18,6 +18,7 @@ const AddCarModal = ({
   const [make, setMake] = useState('');
   const [model, setModel] = useState('');
   const [Reg_No, setReg_No] = useState('');
+  const [sMilage, setSMilage] = useState('');
   const [image, setImage] = useState('https://media.istockphoto.com/photos/red-generic-sedan-car-isolated-on-white-background-3d-illustration-picture-id1189903200?k=20&m=1189903200&s=612x612&w=0&h=L2bus_XVwK5_yXI08X6RaprdFKF1U9YjpN_pVYPgS0o=')
 
   //Data Storage into the DB
@@ -28,13 +29,13 @@ const AddCarModal = ({
     }
     db.transaction(function (tx) {
       tx.executeSql(
-        'INSERT INTO cars (Make, Model, Reg_No, Image) VALUES (?,?,?,?)',
-        [make, model, Reg_No, image],
+        'INSERT INTO cars (Make, Model, Reg_No, Image, SMilage) VALUES (?,?,?,?,?)',
+        [make, model, Reg_No, image, sMilage],
         (_tx, results) => {
           console.log('I Ran');
           console.log('Results', results.rowsAffected);
           if (results.rowsAffected > 0) {
-            Alert.alert('Data Inserted Successfully....');
+            // Alert.alert('Data Inserted Successfully....');
             hideCarModal()
           } else {
             Alert.alert('Failed....');
@@ -153,6 +154,15 @@ const AddCarModal = ({
                 onChangeText={Reg_No => setReg_No(Reg_No)}
                 mode='outlined'
                 dense='true'
+            />
+            <TextInput
+                style = {styles.textStyle}
+                label="Milage"
+                value={sMilage}
+                onChangeText={sMilage => setSMilage(sMilage)}
+                mode='outlined'
+                dense='true'
+                keyboardType="numeric"
             />
             <Button onPress={onTakePhoto}>Capture Image</Button>
             <Button onPress={onSelectImagePress}>Pick Image</Button>

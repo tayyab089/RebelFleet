@@ -22,9 +22,10 @@ const windowWidth = Dimensions.get('window').width-10;
 
 const MilagePage = ({route}) => {
   const {carID} = useContext(IDContext);
+  const {sMilage} = useContext(IDContext);
   const mounted = useRef(true)
   const [milageData, setMilageData] = useState([])
-  const [latestMilage, setLatestMilage] = useState(0)
+  const [latestMilage, setLatestMilage] = useState(sMilage)
   const {colors} = useTheme();
   
   //Add Milage Modal Constants
@@ -93,8 +94,8 @@ const MilagePage = ({route}) => {
     const wbout = XLSX.write(wb, {type:'binary', bookType:"xlsx"});
 
     // Write generated excel to Storage
-    RNFS.writeFile(RNFS.DownloadDirectoryPath + '/RebelFleetData.xlsx', wbout, 'ascii').then((r)=>{
-     console.log('Success');
+    RNFS.writeFile(RNFS.DownloadDirectoryPath + '/MilageData.xlsx', wbout, 'ascii').then((r)=>{
+     Alert.alert('FILE SUCCESSFULLY DOWNLOADED TO DOWNLOADS FOLDER');
     }).catch((e)=>{
       console.log('Error', e);
     });
