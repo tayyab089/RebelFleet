@@ -1,6 +1,8 @@
 import React, {useEffect, useState} from "react";
-import { StyleSheet, Image, View } from "react-native";
+import { StyleSheet, Image, View, Text, Dimensions } from "react-native";
 import {Title} from 'react-native-paper'
+
+const width = Dimensions.get('window').width
 
 const HeaderTitle = (props) => {
     const [tobeUsedTitle, setTobeUsedTitle] = useState('Rebel Fleet')
@@ -12,11 +14,11 @@ const HeaderTitle = (props) => {
     
     return (
         <View style={styles.container}>
+            <Title style={styles.title}>{tobeUsedTitle}</Title>
             <Image
             style={styles.image}
             source={require('../Assets/Logos/logo.png')}
             />
-            <Title style={styles.title}>{tobeUsedTitle}</Title>
         </View>
     )
 };
@@ -25,7 +27,8 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         flexDirection: 'row',
-        alignItems: 'center'
+        alignItems: 'center',
+        justifyContent: 'space-between'
     },
     title: {
         color: 'white',
@@ -34,6 +37,7 @@ const styles = StyleSheet.create({
     image: {
         width: 50,
         height: 50,
+        marginRight: 20,
     }
 })
 

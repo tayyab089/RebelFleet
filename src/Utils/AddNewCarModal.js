@@ -15,6 +15,30 @@ const AddCarModal = ({
 }) => {
   const containerStyle = {backgroundColor: 'white', padding: 10, paddingTop: 20,  margin: 20, borderRadius: 10};
 
+ 
+  return (
+    <Portal>
+      <Modal
+        visible={visible}
+        onDismiss={hideCarModal}
+        contentContainerStyle={containerStyle}>
+        <Surface>
+            <Title
+                style={styles.title}
+            >
+                    Kindly Provide the Following:
+            </Title>
+            <TextInputs
+              hideCarModal= {hideCarModal}
+            />
+        </Surface>
+      </Modal>
+    </Portal>
+  );
+};
+
+const TextInputs = ({hideCarModal}) => {
+
   const [make, setMake] = useState('');
   const [model, setModel] = useState('');
   const [Reg_No, setReg_No] = useState('');
@@ -36,6 +60,10 @@ const AddCarModal = ({
           console.log('Results', results.rowsAffected);
           if (results.rowsAffected > 0) {
             // Alert.alert('Data Inserted Successfully....');
+            setMake('')
+            setModel('')
+            setReg_No('')
+            setSMilage('')
             hideCarModal()
           } else {
             Alert.alert('Failed....');
@@ -117,71 +145,59 @@ const AddCarModal = ({
       setImage(media.assets[0].uri);
       console.log(media.assets[0].fileSize)
     } else {Alert.alert('Picutre not selected')}
-};
-
+  };
+  
   return (
-    <Portal>
-      <Modal
-        visible={visible}
-        onDismiss={hideCarModal}
-        contentContainerStyle={containerStyle}>
-        <Surface>
-            <Title
-                style={styles.title}
-            >
-                    Kindly Provide the Following:
-            </Title>
-            <TextInput
-                style = {styles.textStyle}
-                label="Make"
-                value={make}
-                onChangeText={make => setMake(make)}
-                mode='outlined'
-                dense='true'
-            />
-            <TextInput
-                style = {styles.textStyle}
-                label="Model"
-                value={model}
-                onChangeText={model => setModel(model)}
-                mode='outlined'
-                dense='true'
-            />
-            <TextInput
-                style = {styles.textStyle}
-                label="Registration No."
-                value={Reg_No}
-                onChangeText={Reg_No => setReg_No(Reg_No)}
-                mode='outlined'
-                dense='true'
-            />
-            <TextInput
-                style = {styles.textStyle}
-                label="Milage"
-                value={sMilage}
-                onChangeText={sMilage => setSMilage(sMilage)}
-                mode='outlined'
-                dense='true'
-                keyboardType="numeric"
-            />
-            <Button onPress={onTakePhoto}>Capture Image</Button>
-            <Button onPress={onSelectImagePress}>Pick Image</Button>
-            <View style = {styles.imageContainer}>
-              <Image source={{uri:image, height:150, width: width-60}} resizeMode ='contain'/>
-            </View>
-            <Button
-                mode='contained'
-                style={styles.button}
-                onPress= {()=>dataStorage()}
-            >
-                 ADD 
-            </Button>
-        </Surface>
-      </Modal>
-    </Portal>
-  );
-};
+    <>
+      <TextInput
+          style = {styles.textStyle}
+          label="Make"
+          value={make}
+          onChangeText={make => setMake(make)}
+          mode='outlined'
+          dense='true'
+      />
+      <TextInput
+          style = {styles.textStyle}
+          label="Model"
+          value={model}
+          onChangeText={model => setModel(model)}
+          mode='outlined'
+          dense='true'
+      />
+      <TextInput
+          style = {styles.textStyle}
+          label="Registration No."
+          value={Reg_No}
+          onChangeText={Reg_No => setReg_No(Reg_No)}
+          mode='outlined'
+          dense='true'
+      />
+      <TextInput
+          style = {styles.textStyle}
+          label="Milage"
+          value={sMilage}
+          onChangeText={sMilage => setSMilage(sMilage)}
+          mode='outlined'
+          dense='true'
+          keyboardType="numeric"
+      />
+      <Button onPress={onTakePhoto}>Capture Image</Button>
+      <Button onPress={onSelectImagePress}>Pick Image</Button>
+      <View style = {styles.imageContainer}>
+        <Image source={{uri:image, height:150, width: width-60}} resizeMode ='contain'/>
+      </View>
+      <Button
+          mode='contained'
+          style={styles.button}
+          onPress= {()=>dataStorage()}
+      >
+            ADD 
+      </Button>
+    </>
 
+  )
+}
 const styles = StyleSheet.create({
   textStyle: {margin: 5},
   title: {margin: 5},
