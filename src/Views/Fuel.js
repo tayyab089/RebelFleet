@@ -101,12 +101,15 @@ const FuelPage = ({route}) => {
     let ws = XLSX.utils.json_to_sheet(sample_data_to_export)    
     XLSX.utils.book_append_sheet(wb,ws,"Users")
     const wbout = XLSX.write(wb, {type:'binary', bookType:"xlsx"});
+    const aDate = new Date();
+    const cDate = aDate.toISOString().slice(0,10).replace(/-/g,"");
 
     // Write generated excel to Storage
-    RNFS.writeFile(RNFS.DownloadDirectoryPath + '/FuelData.xlsx', wbout, 'ascii').then((r)=>{
+    RNFS.writeFile(RNFS.DownloadDirectoryPath + `/FuelData-${carID}-${cDate}.xlsx`, wbout, 'ascii').then((r)=>{
       Alert.alert('FILE SUCCESSFULLY DOWNLOADED TO DOWNLOADS FOLDER');
     }).catch((e)=>{
       console.log('Error', e);
+      Alert.alert('COULD NOT WRITE, SEEMS TO BE A STORAGE PERMISSION ISSUE');
     });
 
   }
