@@ -1,5 +1,5 @@
 import React, {useState, useRef, useEffect} from "react";
-import {ScrollView, StyleSheet, FlatList, View, Animated} from 'react-native';
+import {ScrollView, StyleSheet, FlatList, View, Animated, Text, Dimensions} from 'react-native';
 
 import CardComponent from "../Components/Card";
 import ListComponent from "../Components/ListComponent";
@@ -14,9 +14,11 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 const db = openDatabase({name: 'database.db', createFromLocation: 1});
 
+const windowHeight = Dimensions.get('window').height
 
 const HomePage = ({navigation}) => {
     const mounted = useRef(true);
+    const [changer, setChanger] = useState(false)
     const [carData, setCarData] = useState([
       {ID: 1, Make: 'Toyota', Model: 'Corolla 2017', Reg_No:'BJT1951', sMilage: 1234},
       {ID: 2, Make: 'Toyota', Model: 'Corolla 2017', Reg_No:'BJT1951', sMilage: 1234}, 
@@ -26,28 +28,36 @@ const HomePage = ({navigation}) => {
     const [visible, setVisible] = useState(false);
     const showCarModal = () => setVisible(true);
     const hideCarModal = () => {
-      retrieveData()
+      fetchData()
       setVisible(false)
     };
 
+    async function fetchData() {
+      const returnedData = await retrieveData()
+      if(returnedData.length != 0){
+        setCarData(returnedData)
+        setChanger(false)
+      } else {
+        setChanger(true)
+      }
+    }
+
     useEffect(() => {
-      navigation.addListener('focus', () => {
-        retrieveData();
-      });
+        fetchData()
     }, []);
 
     const retrieveData = () => {
-      db.transaction(tx => {
-        tx.executeSql('SELECT * FROM cars', [], (_tx, results) => {
-          var temp = [];
-          console.log(results.rows.length);
-          for (let i = 0; i < results.rows.length; ++i) {
-            temp.push(results.rows.item(i));
-            console.log(temp)
-          }
-          if (mounted.current) {
-            setCarData(temp);
-          }
+      return new Promise (resolve =>{
+        db.transaction(tx => {
+          tx.executeSql('SELECT * FROM cars', [], (_tx, results) => {
+            var temp = [];
+            for (let i = 0; i < results.rows.length; ++i) {
+              temp.push(results.rows.item(i));
+            }
+            if (mounted.current) {
+              resolve(temp);
+            }
+          });
         });
       });
     };
@@ -86,7 +96,7 @@ const HomePage = ({navigation}) => {
               [ID],
               (_tx, results) => {
                 if (results.rows.length === 0) {
-                  retrieveData();
+                  fetchData();
                 }
               },
             );
@@ -144,6 +154,10 @@ const HomePage = ({navigation}) => {
             visible={visible} 
             hideCarModal={hideCarModal}
             />
+          {changer ? 
+          <View style = {styles.initialTextContainer}>
+            <Text style = {styles.initialText}> Please Add New Car By Clicking on the  '+' button</Text>
+          </View>:
           <Animated.FlatList
             data={carData}
             renderItem={renderItem}
@@ -151,6 +165,7 @@ const HomePage = ({navigation}) => {
             // onScroll= {handleScroll}
             contentContainerStyle={{ paddingBottom: 200 }}
           />
+         }
         </View>
       </SafeAreaView>
     )
@@ -159,6 +174,16 @@ const HomePage = ({navigation}) => {
 const styles = StyleSheet.create({
   container: {
     margin: 5,
+  },
+  initialTextContainer: {
+    height: windowHeight - 100,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  initialText: {
+    fontSize: 20,
+    margin: 5,
+    textAlign: 'center'
   }
 })
 

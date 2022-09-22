@@ -1,5 +1,5 @@
 import React, {useState, useEffect, useRef, useContext} from "react";
-import {ScrollView, StyleSheet, Dimensions, View} from 'react-native';
+import {ScrollView, StyleSheet, Dimensions, View, TouchableOpacity} from 'react-native';
 import { useTheme, Surface, Title} from "react-native-paper";
 
 import {openDatabase} from 'react-native-sqlite-storage';
@@ -54,39 +54,40 @@ const TrendPage = ({route}) => {
   })
   };
 
+  async function fetchDataMilage() {
+    const returnedData = await retrieveDataMilage()
+    if (returnedData.length != 0){
+    const data = returnedData.map(item => item.MilageDiff)
+    const labels = returnedData.map(item => new Date(item.DateTime).toISOString().split('T')[0])
+    const filteredData = {
+      labels: labels,
+      datasets: [
+        {
+          data: data
+        }
+      ]
+    }
+    setdataLineChart1(filteredData)
+   } else {setIsLineChart1Data(false)}
+  };
+  async function fetchDataFuel() {
+    const returnedData = await retrieveDataFuel()
+    if (returnedData.length != 0){
+    const data = returnedData.map(item => item.FuelAmount)
+    const labels = returnedData.map(item => new Date(item.DateTime).toISOString().split('T')[0])
+    const filteredData = {
+      labels: labels,
+      datasets: [
+        {
+          data: data
+        }
+      ]
+    }
+    setdataLineChart2(filteredData)
+    } else {setIsLineChart2Data(false)}
+  };
+
   useEffect(() => {
-    async function fetchDataMilage() {
-      const returnedData = await retrieveDataMilage()
-      if (returnedData.length != 0){
-      const data = returnedData.map(item => item.MilageDiff)
-      const labels = returnedData.map(item => new Date(item.DateTime).toISOString().split('T')[0])
-      const filteredData = {
-        labels: labels,
-        datasets: [
-          {
-            data: data
-          }
-        ]
-      }
-      setdataLineChart1(filteredData)
-     } else {setIsLineChart1Data(false)}
-    };
-    async function fetchDataFuel() {
-      const returnedData = await retrieveDataFuel()
-      if (returnedData.length != 0){
-      const data = returnedData.map(item => item.FuelAmount)
-      const labels = returnedData.map(item => new Date(item.DateTime).toISOString().split('T')[0])
-      const filteredData = {
-        labels: labels,
-        datasets: [
-          {
-            data: data
-          }
-        ]
-      }
-      setdataLineChart2(filteredData)
-      } else {setIsLineChart2Data(false)}
-    };
     fetchDataMilage()
     fetchDataFuel()
   }, []);
@@ -128,7 +129,7 @@ const TrendPage = ({route}) => {
     backgroundColor: '#ffffff',
     backgroundGradientFrom: '#ffffff',
     backgroundGradientTo: '#ffffff',
-    decimalPlaces: 2, // optional, defaults to 2dp
+    decimalPlaces: 0, // optional, defaults to 2dp
     color: (opacity = 1) => `rgba(244, 81, 30, ${opacity})`,
     labelColor: (opacity = 1) => `rgba(244, 81, 30, ${opacity})`,
     style: {
@@ -145,7 +146,11 @@ const TrendPage = ({route}) => {
 
   return (
     <ScrollView style={{...styles.container, backgroundColor: colors.primary}}>
-      <Surface style={styles.heading}><Title style = {{color: colors.primary}}>Milage Data</Title></Surface>
+      <TouchableOpacity
+        onPress={fetchDataMilage}
+      >
+        <Surface style={styles.heading}><Title style = {{color: colors.primary}}>Milage Data</Title></Surface>
+      </TouchableOpacity>
       {isLineChart1Data ? 
       <LineChart
         data={dataLineChart1}
@@ -160,7 +165,11 @@ const TrendPage = ({route}) => {
         style={styles.chart}
       /> : <Surface style={styles.noData}><Title style = {{color: colors.primary}}>No Milage Data</Title></Surface>
       }
-      <Surface style={styles.heading}><Title style = {{color: colors.primary}}>Fuel Data</Title></Surface>
+      <TouchableOpacity
+        onPress={fetchDataFuel}
+      >
+        <Surface style={styles.heading}><Title style = {{color: colors.primary}}>Fuel Data</Title></Surface>
+      </TouchableOpacity>
       {isLineChart2Data ? 
       <LineChart
         data={dataLineChart2}
