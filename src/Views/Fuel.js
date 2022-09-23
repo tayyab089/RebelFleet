@@ -106,7 +106,7 @@ const FuelPage = ({route}) => {
 
     // Write generated excel to Storage
     RNFS.writeFile(RNFS.DownloadDirectoryPath + `/FuelData-${carID}-${cDate}.xlsx`, wbout, 'ascii').then((r)=>{
-      Alert.alert('FILE SUCCESSFULLY DOWNLOADED TO DOWNLOADS FOLDER');
+      Alert.alert('DONE', 'Please Find the File in your downloads folder');
     }).catch((e)=>{
       console.log('Error', e);
       Alert.alert('COULD NOT WRITE, SEEMS TO BE A STORAGE PERMISSION ISSUE');

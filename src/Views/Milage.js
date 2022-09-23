@@ -97,13 +97,36 @@ const MilagePage = ({route}) => {
 
     // Write generated excel to Storage
     RNFS.writeFile(RNFS.DownloadDirectoryPath + `/MilageData-${carID}-${cDate}.xlsx`, wbout, 'ascii').then((r)=>{
-     Alert.alert('FILE SUCCESSFULLY DOWNLOADED TO DOWNLOADS FOLDER');
+     Alert.alert('DONE', 'Please Find the File in your downloads folder');
+    //  Alert.alert(
+    //   "File saved to downloads folder",
+    //   "Do You Want to Open it now?",
+    //   [
+    //     {
+    //       text: "Ask me later",
+    //       onPress: () => console.log("Ask me later pressed")
+    //     },
+    //     {
+    //       text: "Cancel",
+    //       onPress: () => console.log("Cancel Pressed"),
+    //       style: "cancel"
+    //     },
+    //     { text: "OK", onPress: () => openSavedFile(cDate, wbout) }
+    //   ]
+    // );
+
     }).catch((e)=>{
       console.log('Error', e);
       Alert.alert('COULD NOT WRITE, SEEMS TO BE A STORAGE PERMISSION ISSUE');
     });
 
   }
+
+  // const openSavedFile = (cDate) => {
+  //   RNFS.readFile(RNFS.DownloadDirectoryPath + `/MilageData-${carID}-${cDate}.xlsx`, 'ascii').then(r=>{
+  //     console.log(r)
+  //   }).catch(e => console.log(e))
+  // }
 
   const handleClick = async () => {
 
